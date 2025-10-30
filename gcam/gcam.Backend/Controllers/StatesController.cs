@@ -1,4 +1,5 @@
-﻿using gcam.Backend.UnitsOfWork.Interfaces;
+﻿using gcam.Backend.UnitsOfWork.Implementations;
+using gcam.Backend.UnitsOfWork.Interfaces;
 using gcam.Shared.Entities;
 using Microsoft.AspNetCore.Mvc;
 
@@ -6,19 +7,19 @@ namespace gcam.Backend.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class CountriesController : GenericController<Country>
+public class StatesController : GenericController<State>
 {
-    private readonly ICountriesUnitOfWork _countriesUnitOfWork;
+    private readonly IStatesUnitOfWork _statesUnitOfWork;
 
-    public CountriesController(IGenericUnitOfWork<Country> unitOfWork, ICountriesUnitOfWork countriesUnitOfWork) : base(unitOfWork)
+    public StatesController(IGenericUnitOfWork<State> unitOfWork, IStatesUnitOfWork statesUnitOfWork) : base(unitOfWork)
     {
-        _countriesUnitOfWork = countriesUnitOfWork;
+        _statesUnitOfWork = statesUnitOfWork;
     }
 
     [HttpGet]
     public override async Task<IActionResult> GetAsync()
     {
-        var action = await _countriesUnitOfWork.GetAsync();
+        var action = await _statesUnitOfWork.GetAsync();
         if (action.WasSuccess)
         {
             return Ok(action.Result);
@@ -29,7 +30,7 @@ public class CountriesController : GenericController<Country>
     [HttpGet("{id:int}")]
     public override async Task<IActionResult> GetAsync(int id)
     {
-        var action = await _countriesUnitOfWork.GetAsync(id);
+        var action = await _statesUnitOfWork.GetAsync(id);
         if (action.WasSuccess)
         {
             return Ok(action.Result);
