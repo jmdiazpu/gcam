@@ -1,4 +1,5 @@
 ﻿using gcam.Backend.UnitsOfWork.Interfaces;
+using gcam.Shared.DTOs;
 using gcam.Shared.Entities;
 using Microsoft.AspNetCore.Mvc;
 
@@ -13,6 +14,17 @@ public class CountriesController : GenericController<Country>
     public CountriesController(IGenericUnitOfWork<Country> unitOfWork, ICountriesUnitOfWork countriesUnitOfWork) : base(unitOfWork)
     {
         _countriesUnitOfWork = countriesUnitOfWork;
+    }
+
+    [HttpGet("paginated")]
+    public override async Task<IActionResult> GetAsync(PaginationDTO pagination)
+    {
+        var response = await _countriesUnitOfWork.GetAsync(pagination);
+        if (response.WasSuccess)
+        {
+            return Ok(response.Result);
+        }
+        return BadRequest();
     }
 
     [HttpGet]

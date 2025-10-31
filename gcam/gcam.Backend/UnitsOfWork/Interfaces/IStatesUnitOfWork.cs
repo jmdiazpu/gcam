@@ -2,9 +2,9 @@
 using gcam.Shared.Entities;
 using gcam.Shared.Responses;
 
-namespace gcam.Backend.Repositories.Interfaces;
+namespace gcam.Backend.UnitsOfWork.Interfaces;
 
-public interface IStatesRepository
+public interface IStatesUnitOfWork
 {
     Task<ActionResponse<IEnumerable<State>>> GetAsync(PaginationDTO pagination);
 

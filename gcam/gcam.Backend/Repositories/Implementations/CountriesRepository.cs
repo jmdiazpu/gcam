@@ -1,5 +1,7 @@
 ﻿using gcam.Backend.Data;
+using gcam.Backend.Helpers;
 using gcam.Backend.Repositories.Interfaces;
+using gcam.Shared.DTOs;
 using gcam.Shared.Entities;
 using gcam.Shared.Responses;
 using Microsoft.EntityFrameworkCore;
@@ -13,6 +15,21 @@ public class CountriesRepository : GenericRepository<Country>, ICountriesReposit
     public CountriesRepository(DataContext context) : base(context)
     {
         _context = context;
+    }
+
+    public override async Task<ActionResponse<IEnumerable<Country>>> GetAsync(PaginationDTO pagination)
+    {
+        var queryable = _context.Countries
+            .Include(x => x.States)
+            .AsQueryable();
+        return new ActionResponse<IEnumerable<Country>>
+        {
+            WasSuccess = true,
+            Result = await queryable
+            .OrderBy(x => x.Name)
+            .Paginate(pagination)
+            .ToListAsync()
+        };
     }
 
     public override async Task<ActionResponse<IEnumerable<Country>>> GetAsync()

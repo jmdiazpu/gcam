@@ -1,5 +1,6 @@
 ﻿using gcam.Backend.Repositories.Interfaces;
 using gcam.Backend.UnitsOfWork.Interfaces;
+using gcam.Shared.DTOs;
 using gcam.Shared.Entities;
 using gcam.Shared.Responses;
 
@@ -14,13 +15,9 @@ public class CountriesUnitOfWork : GenericUnitOfWork<Country>, ICountriesUnitOfW
         _countriesRepository = countriesRepository;
     }
 
-    public override async Task<ActionResponse<IEnumerable<Country>>> GetAsync()
-    {
-        return await _countriesRepository.GetAsync();
-    }
+    public override async Task<ActionResponse<IEnumerable<Country>>> GetAsync(PaginationDTO pagination) => await _countriesRepository.GetAsync(pagination);
 
-    public override async Task<ActionResponse<Country>> GetAsync(int id)
-    {
-        return await _countriesRepository.GetAsync(id);
-    }
+    public override async Task<ActionResponse<IEnumerable<Country>>> GetAsync() => await _countriesRepository.GetAsync();
+
+    public override async Task<ActionResponse<Country>> GetAsync(int id) => await _countriesRepository.GetAsync(id);
 }

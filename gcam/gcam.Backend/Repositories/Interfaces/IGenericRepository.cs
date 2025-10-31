@@ -1,9 +1,14 @@
-﻿using gcam.Shared.Responses;
+﻿using gcam.Shared.DTOs;
+using gcam.Shared.Responses;
 
 namespace gcam.Backend.Repositories.Interfaces;
 
 public interface IGenericRepository<T> where T : class
 {
+    Task<ActionResponse<IEnumerable<T>>> GetAsync(PaginationDTO pagination);
+
+    Task<ActionResponse<int>> GetTotalRecordsAsync(PaginationDTO pagination);
+
     Task<ActionResponse<T>> GetAsync(int id);
 
     Task<ActionResponse<IEnumerable<T>>> GetAsync();
