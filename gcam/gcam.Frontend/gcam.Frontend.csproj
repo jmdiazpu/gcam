@@ -16,4 +16,11 @@
   <ItemGroup>
     <ProjectReference Include="..\gcam.Shared\gcam.Shared.csproj" />
   </ItemGroup>
+
+
+  <ItemGroup>
+    <Content Update="wwwroot\Images\vecteezy_volumetric-3d-question-mark-on-png-transprent-background_13775742.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
 </Project>
