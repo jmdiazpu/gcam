@@ -1,0 +1,19 @@
+﻿@page "/countries"
+
+<h3>Países</h3>
+
+@if(countries== null)
+{
+    <p><em>Cargando...</em></p>
+}
+else
+{
+    <MudTable Items="@countries" Hover="true" Bordered="true" Striped="true">
+        <HeaderContent>
+            <MudTh>País</MudTh>
+        </HeaderContent>
+            <RowTemplate>
+                <MudTd>@context.Name</MudTd>
+            </RowTemplate>
+    </MudTable>
+}

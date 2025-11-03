@@ -36,6 +36,7 @@ public class CountriesRepository : GenericRepository<Country>, ICountriesReposit
     {
         var countries = await _context.Countries
             .Include(x => x.States)
+            .OrderBy(x => x.Name)
             .ToListAsync();
         return new ActionResponse<IEnumerable<Country>>
         {
