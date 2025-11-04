@@ -28,6 +28,17 @@ public class CountriesController : GenericController<Country>
         return BadRequest();
     }
 
+    [HttpGet("totalRecords")]
+    public override async Task<IActionResult> GetTotalRecordsAsync([FromQuery] PaginationDTO pagination)
+    {
+        var response = await _countriesUnitOfWork.GetTotalRecordsAsync(pagination);
+        if (response.WasSuccess)
+        {
+            return Ok(response.Result);
+        }
+        return BadRequest();
+    }
+
     [HttpGet]
     public override async Task<IActionResult> GetAsync()
     {
