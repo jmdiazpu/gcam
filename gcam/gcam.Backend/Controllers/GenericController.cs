@@ -24,7 +24,7 @@ public class GenericController<T> : Controller where T : class
         return BadRequest();
     }
 
-    [HttpGet("totalRecords")]
+    [HttpGet("TotalRecords")]
     public virtual async Task<IActionResult> GetTotalRecordsAsync([FromQuery] PaginationDTO pagination)
     {
         var action = await _unitOfWork.GetTotalRecordsAsync(pagination);

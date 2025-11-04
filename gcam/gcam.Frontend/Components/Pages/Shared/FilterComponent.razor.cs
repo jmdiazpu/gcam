@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Components;
 
-namespace gcam.Frontend.Components.Shared;
+namespace gcam.Frontend.Components.Pages.Shared;
 
 public partial class FilterComponent
 {
