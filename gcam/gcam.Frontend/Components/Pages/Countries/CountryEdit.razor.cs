@@ -47,7 +47,7 @@ public partial class CountryEdit
             return;
         }
         Return();
-        Snackbar.Add("País " + country!.Name + " editado", Severity.Success);
+        Snackbar.Add("País " + country!.Name + " guardado.", Severity.Success);
     }
 
     private void Return()

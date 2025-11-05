@@ -2,13 +2,12 @@ using gcam.Frontend.Repositories;
 using gcam.Shared.Entities;
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
-using System.Net;
 
-namespace gcam.Frontend.Components.Pages.States;
+namespace gcam.Frontend.Components.Pages.Cities;
 
-public partial class StateEdit
+public partial class CityEdit
 {
-    private State? state;
+    private City? city;
 
     [Inject] private NavigationManager NavigationManager { get; set; } = null!;
     [Inject] private IRepository Repository { get; set; } = null!;
@@ -18,13 +17,13 @@ public partial class StateEdit
 
     protected override async Task OnInitializedAsync()
     {
-        var responseHttp = await Repository.GetAsync<State>($"api/states/{Id}");
+        var responseHttp = await Repository.GetAsync<City>($"api/cities/{Id}");
 
         if (responseHttp.Error)
         {
-            if (responseHttp.HttpResponseMessage.StatusCode == HttpStatusCode.NotFound)
+            if (responseHttp.HttpResponseMessage.StatusCode == System.Net.HttpStatusCode.NotFound)
             {
-                NavigationManager.NavigateTo("states");
+                NavigationManager.NavigateTo("cities");
             }
             else
             {
@@ -34,13 +33,13 @@ public partial class StateEdit
         }
         else
         {
-            state = responseHttp.Response;
+            city = responseHttp.Response;
         }
     }
 
     private async Task EditAsync()
     {
-        var responseHttp = await Repository.PutAsync("api/states", state);
+        var responseHttp = await Repository.PutAsync("api/cities", city);
 
         if (responseHttp.Error)
         {
@@ -50,11 +49,11 @@ public partial class StateEdit
         }
 
         Return();
-        Snackbar.Add("Departamento " + state!.Name + " guardado.", Severity.Success);
+        Snackbar.Add("Ciudad " + city.Name + " guardado.", Severity.Success);
     }
 
     private void Return()
     {
-        NavigationManager.NavigateTo($"/countries/details/{state!.CountryId}");
+        NavigationManager.NavigateTo($"/states/details/{city!.StateId}");
     }
 }

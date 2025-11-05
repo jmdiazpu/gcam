@@ -1,4 +1,4 @@
-﻿@page "/countries/details/{CountryId:int}"
+﻿@page "/states/details/{StateId:int}"
 
 @if (loading)
 {
@@ -6,7 +6,7 @@
 }
 else
 {
-    <MudTable Items="@states"
+    <MudTable Items="@cities"
               @ref="table"
               ServerData="LoadListAsync"
               Dense="true"
@@ -15,24 +15,18 @@ else
               FixedHeader="true"
               FixedFooter="true">
         <ToolBarContent>
-            <MudText Typo="Typo.h6" Class="mr-4"><i class="bi bi-globe-americas"></i> @country?.Name</MudText>
+            <MudText Typo="Typo.h6" Class="mr-4"><i class="bi bi-globe-americas"></i> @state?.Name</MudText>
             <MudButton Variant="Variant.Outlined" Class="mr-4" StartIcon="@Icons.Material.Filled.ArrowBack" Color="Color.Tertiary" OnClick="ReturnAction">Regresar</MudButton>
             <MudButton Variant="Variant.Outlined" Class="mr-4" EndIcon="@Icons.Material.Filled.Add" Color="Color.Info" OnClick="@(() => ShowModalAsync())">Crear</MudButton>
             <MudSpacer />
             <FilterComponent ApplyFilter="SetFilterValue" />
         </ToolBarContent>
         <HeaderContent>
-            <MudTh>Estado</MudTh>
-            <MudTh style="width: 100px;">Ciudades</MudTh>
+            <MudTh>Ciudad</MudTh>
             <MudTh style="width: 270px;">Acciones</MudTh>
         </HeaderContent>
         <RowTemplate>
-            <MudTd DataLabel="Departamento">@context.Name</MudTd>
-            <MudTd DataLabel="Ciudades">
-                <MudButton Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.Map" Color="Color.Info" OnClick="@(() => CitiesAction(@context))" style="width: 100px;">
-                    @context.CitiesNumber
-                </MudButton>
-            </MudTd>
+            <MudTd DataLabel="Ciudad">@context.Name</MudTd>
             <MudTd DataLabel="Acciones">
                 <MudTooltip Text="Editar">
                     <MudButton Variant="Variant.Filled"

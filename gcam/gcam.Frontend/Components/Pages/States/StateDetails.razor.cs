@@ -1,26 +1,26 @@
+using gcam.Frontend.Components.Pages.Cities;
 using gcam.Frontend.Components.Pages.Shared;
-using gcam.Frontend.Components.Pages.States;
 using gcam.Frontend.Repositories;
 using gcam.Shared.Entities;
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
 using System.Net;
 
-namespace gcam.Frontend.Components.Pages.Countries;
+namespace gcam.Frontend.Components.Pages.States;
 
-public partial class CountryDetails
+public partial class StateDetails
 {
-    private Country? country;
-    private List<State>? states;
+    private State? state;
+    private List<City>? cities;
 
-    private MudTable<State> table = new();
+    private MudTable<City> table = new();
     private readonly int[] pageSizeOptions = { 10, 25, 50, 5, int.MaxValue };
     private int totalRecords = 0;
     private bool loading;
-    private const string baseUrl = "api/states";
+    private const string baseUrl = "api/cities";
     private string infoFormat = "Registros {first_item} al {last_item} de {all_items}";
 
-    [Parameter] public int CountryId { get; set; }
+    [Parameter] public int StateId { get; set; }
 
     [Inject] private IRepository Repository { get; set; } = null!;
     [Inject] private IDialogService DialogService { get; set; } = null!;
@@ -39,9 +39,9 @@ public partial class CountryDetails
         await LoadTotalRecordsAsync();
     }
 
-    private async Task<bool> LoadCountryAsync()
+    private async Task<bool> LoadStateAsync()
     {
-        var responseHttp = await Repository.GetAsync<Country>($"/api/countries/{CountryId}");
+        var responseHttp = await Repository.GetAsync<State>($"/api/states/{StateId}");
         if (responseHttp.Error)
         {
             if (responseHttp.HttpResponseMessage.StatusCode == HttpStatusCode.NotFound)
@@ -54,24 +54,25 @@ public partial class CountryDetails
             Snackbar.Add(message!, Severity.Error);
             return false;
         }
-        country = responseHttp.Response;
+        state = responseHttp.Response;
         return true;
     }
 
     private async Task<bool> LoadTotalRecordsAsync()
     {
         loading = true;
-        if (country is null)
+        if (state is null)
         {
-            var ok = await LoadCountryAsync();
+            var ok = await LoadStateAsync();
             if (!ok)
             {
-                NoCountry();
+                NoState();
                 return false;
             }
         }
 
-        var url = $"{baseUrl}/totalRecords?id={CountryId}";
+        var url = $"{baseUrl}/totalRecords?id={StateId}";
+
         if (!string.IsNullOrWhiteSpace(Filter))
         {
             url += $"&filter={Filter}";
@@ -88,29 +89,29 @@ public partial class CountryDetails
         return true;
     }
 
-    private async Task<TableData<State>> LoadListAsync(TableState state, CancellationToken cancellationToken)
+    private async Task<TableData<City>> LoadListAsync(TableState state, CancellationToken cancellationToken)
     {
         int page = state.Page + 1;
         int pageSize = state.PageSize;
-        var url = $"{baseUrl}/paginated?id={CountryId}&page={page}&recordsnumber={pageSize}";
+        var url = $"{baseUrl}/paginated?id={StateId}&page={page}&recordsnumber={pageSize}";
 
         if (!string.IsNullOrWhiteSpace(Filter))
         {
             url += $"&filter={Filter}";
         }
 
-        var responseHttp = await Repository.GetAsync<List<State>>(url);
+        var responseHttp = await Repository.GetAsync<List<City>>(url);
         if (responseHttp.Error)
         {
             var message = await responseHttp.GetErrorMessageAsync();
             Snackbar.Add(message!, Severity.Error);
-            return new TableData<State> { Items = [], TotalItems = 0 };
+            return new TableData<City> { Items = [], TotalItems = 0 };
         }
         if (responseHttp.Response == null)
         {
-            return new TableData<State> { Items = [], TotalItems = 0 };
+            return new TableData<City> { Items = [], TotalItems = 0 };
         }
-        return new TableData<State>
+        return new TableData<City>
         {
             Items = responseHttp.Response,
             TotalItems = totalRecords
@@ -126,7 +127,7 @@ public partial class CountryDetails
 
     private void ReturnAction()
     {
-        NavigationManager.NavigateTo("/countries");
+        NavigationManager.NavigateTo($"/countries/details/{state?.CountryId}");
     }
 
     private async Task ShowModalAsync(int id = 0, bool isEdit = false)
@@ -142,15 +143,15 @@ public partial class CountryDetails
             var parameters = new DialogParameters
             {
                 { "Id", id }
-            }; dialog = await DialogService.ShowAsync<StateEdit>("Editar departamento", parameters, options);
+            }; dialog = await DialogService.ShowAsync<CityEdit>("Editar Ciudad", parameters, options);
         }
         else
         {
             var parameters = new DialogParameters
                 {
-                    { "CountryId", CountryId }
+                    { "StateId", StateId }
                 };
-            dialog = await DialogService.ShowAsync<StateCreate>("Nuevo departamento", parameters, options);
+            dialog = await DialogService.ShowAsync<CityCreate>("Nuevo Ciudad", parameters, options);
         }
 
         var result = await dialog.Result;
@@ -161,21 +162,16 @@ public partial class CountryDetails
         }
     }
 
-    private void CitiesAction(State state)
-    {
-        NavigationManager.NavigateTo($"/states/details/{state.Id}");
-    }
-
-    private void NoCountry()
+    private void NoState()
     {
         NavigationManager.NavigateTo("/countries");
     }
 
-    private async Task DeleteAsync(State state)
+    private async Task DeleteAsync(City city)
     {
         var parameters = new DialogParameters
             {
-                { "Message", $"¿Estás seguro de que quieres eliminar el departamento {state.Name}?" }
+                { "Message", $"¿Estás seguro que quieres eliminar la ciudad {city.Name}?" }
             };
         var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall, CloseOnEscapeKey = true };
         var dialog = await DialogService.ShowAsync<ConfirmDialog>("Confirmación", parameters, options);
@@ -185,15 +181,24 @@ public partial class CountryDetails
             return;
         }
 
-        var responseHttp = await Repository.DeleteAsync($"api/states/{state.Id}");
+        var responseHttp = await Repository.DeleteAsync($"api/cities/{city.Id}");
         if (responseHttp.Error)
         {
-            var message = await responseHttp.GetErrorMessageAsync();
-            Snackbar.Add(message!, Severity.Error);
+            if (responseHttp.HttpResponseMessage.StatusCode == HttpStatusCode.NotFound)
+            {
+                var message = await responseHttp.GetErrorMessageAsync();
+                Snackbar.Add(message!, Severity.Error);
+                return;
+            }
+            else
+            {
+                var message = await responseHttp.GetErrorMessageAsync();
+                Snackbar.Add(message!, Severity.Error);
+            }
             return;
         }
         await LoadAsync();
         await table.ReloadServerData();
-        Snackbar.Add("Departamento " + @state.Name + " eliminado.", Severity.Success);
+        Snackbar.Add("Ciudad " + city.Name + " eliminada.", Severity.Success);
     }
 }
