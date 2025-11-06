@@ -15,6 +15,26 @@ public class SeedDb
     {
         await _context.Database.EnsureCreatedAsync();
         await CheckCountriesAsync();
+        await CheckStatesAsync();
+        await CheckCitiesAsync();
+    }
+
+    private async Task CheckCitiesAsync()
+    {
+        if (!_context.Cities.Any())
+        {
+            _context.Cities.Add(new City { Name = "Acacías", StateId = 1 });
+            await _context.SaveChangesAsync();
+        }
+    }
+
+    private async Task CheckStatesAsync()
+    {
+        if (!_context.States.Any())
+        {
+            _context.States.Add(new State { Name = "Meta", CountryId = 1 });
+            await _context.SaveChangesAsync();
+        }
     }
 
     private async Task CheckCountriesAsync()

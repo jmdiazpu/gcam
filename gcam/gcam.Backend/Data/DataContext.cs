@@ -10,6 +10,8 @@ public class DataContext : DbContext
     }
 
     public DbSet<City> Cities { get; set; }
+    public DbSet<Company> Companies { get; set; }
+    public DbSet<CompanyContact> CompanyContacts { get; set; }
     public DbSet<Country> Countries { get; set; }
     public DbSet<State> States { get; set; }
 
@@ -17,6 +19,8 @@ public class DataContext : DbContext
     {
         base.OnModelCreating(modelBuilder);
         modelBuilder.Entity<City>().HasIndex(x => new { x.Name, x.StateId }).IsUnique();
+        modelBuilder.Entity<Company>().HasIndex(x => x.Name).IsUnique();
+        modelBuilder.Entity<CompanyContact>().HasIndex(x => new { x.FullName, x.CompanyId }).IsUnique();
         modelBuilder.Entity<Country>().HasIndex(x => x.Name).IsUnique();
         modelBuilder.Entity<State>().HasIndex(x => new { x.Name, x.CountryId }).IsUnique();
         DisableCascadingDelete(modelBuilder);

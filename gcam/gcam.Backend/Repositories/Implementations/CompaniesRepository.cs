@@ -8,19 +8,18 @@ using Microsoft.EntityFrameworkCore;
 
 namespace gcam.Backend.Repositories.Implementations;
 
-public class CountriesRepository : GenericRepository<Country>, ICountriesRepository
+public class CompaniesRepository : GenericRepository<Company>, ICompaniesRepository
 {
     private readonly DataContext _context;
 
-    public CountriesRepository(DataContext context) : base(context)
+    public CompaniesRepository(DataContext context) : base(context)
     {
         _context = context;
     }
 
-    public override async Task<ActionResponse<IEnumerable<Country>>> GetAsync(PaginationDTO pagination)
+    public override async Task<ActionResponse<IEnumerable<Company>>> GetAsync(PaginationDTO pagination)
     {
-        var queryable = _context.Countries
-            .Include(x => x.States)
+        var queryable = _context.Companies
             .AsQueryable();
 
         if (!string.IsNullOrEmpty(pagination.Filter))
@@ -28,7 +27,7 @@ public class CountriesRepository : GenericRepository<Country>, ICountriesReposit
             queryable = queryable.Where(x => x.Name.ToLower().Contains(pagination.Filter.ToLower()));
         }
 
-        return new ActionResponse<IEnumerable<Country>>
+        return new ActionResponse<IEnumerable<Company>>
         {
             WasSuccess = true,
             Result = await queryable
@@ -40,7 +39,7 @@ public class CountriesRepository : GenericRepository<Country>, ICountriesReposit
 
     public override async Task<ActionResponse<int>> GetTotalRecordsAsync(PaginationDTO pagination)
     {
-        var queryable = _context.Countries.AsQueryable();
+        var queryable = _context.Companies.AsQueryable();
         if (!string.IsNullOrEmpty(pagination.Filter))
         {
             queryable = queryable.Where(x => x.Name.ToLower().Contains(pagination.Filter.ToLower()));
@@ -54,38 +53,34 @@ public class CountriesRepository : GenericRepository<Country>, ICountriesReposit
         };
     }
 
-    public override async Task<ActionResponse<IEnumerable<Country>>> GetAsync()
+    public override async Task<ActionResponse<IEnumerable<Company>>> GetAsync()
     {
-        var countries = await _context.Countries
-            .Include(x => x.States!)
-            .ThenInclude(x => x.Cities)
+        var companies = await _context.Companies
             .OrderBy(x => x.Name)
             .ToListAsync();
 
-        return new ActionResponse<IEnumerable<Country>>
+        return new ActionResponse<IEnumerable<Company>>
         {
             WasSuccess = true,
-            Result = countries
+            Result = companies
         };
     }
 
-    public override async Task<ActionResponse<Country>> GetAsync(int id)
+    public override async Task<ActionResponse<Company>> GetAsync(int id)
     {
-        var country = await _context.Countries
-            .Include(x => x.States!)
-            .ThenInclude(x => x.Cities)
+        var company = await _context.Companies
             .FirstOrDefaultAsync(x => x.Id == id);
-        if (country == null)
+        if (company == null)
         {
-            return new ActionResponse<Country>
+            return new ActionResponse<Company>
             {
-                Message = "País no existe."
+                Message = "Empresa no existe."
             };
         }
-        return new ActionResponse<Country>
+        return new ActionResponse<Company>
         {
             WasSuccess = true,
-            Result = country
+            Result = company
         };
     }
 }
