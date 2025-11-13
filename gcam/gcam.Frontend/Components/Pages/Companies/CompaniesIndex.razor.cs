@@ -5,16 +5,16 @@ using Microsoft.AspNetCore.Components;
 using MudBlazor;
 using System.Net;
 
-namespace gcam.Frontend.Components.Pages.Countries;
+namespace gcam.Frontend.Components.Pages.Companies;
 
-public partial class CountriesIndex
+public partial class CompaniesIndex
 {
-    private List<Country>? Countries { get; set; }
-    private MudTable<Country> table = new();
+    private List<Company>? Companies { get; set; }
+    private MudTable<Company> table = new();
     private readonly int[] pageSizeOptions = { 10, 25, 50, int.MaxValue };
     private int TotalRecords;
     private bool Loading;
-    private const string BaseUrl = "api/countries";
+    private const string BaseUrl = "api/companies";
     private string infoFormat = "Registros {first_item} al {last_item} de {all_items}";
 
     [Inject] private IRepository Repository { get; set; } = null!;
@@ -29,9 +29,9 @@ public partial class CountriesIndex
         await LoadTotalRecordsAsync();
     }
 
-    private void StatesAction(Country country)
+    private void StatesAction(Company company)
     {
-        NavigationManager.NavigateTo($"/countries/details/{country.Id}");
+        NavigationManager.NavigateTo($"/companies/details/{company.Id}");
     }
 
     private async Task LoadTotalRecordsAsync()
@@ -54,29 +54,28 @@ public partial class CountriesIndex
         Loading = false;
     }
 
-    private async Task<TableData<Country>> LoadListAsync(TableState state, CancellationToken cancellationToken)
+    private async Task<TableData<Company>> LoadListAsync(TableState state, CancellationToken cancellationToken)
     {
         int page = state.Page + 1;
         int pageSize = state.PageSize;
         var url = $"{BaseUrl}/paginated/?page={page}&recordsnumber={pageSize}";
-
         if (!string.IsNullOrWhiteSpace(Filter))
         {
             url += $"&filter={Filter}";
         }
 
-        var responseHttp = await Repository.GetAsync<List<Country>>(url);
+        var responseHttp = await Repository.GetAsync<List<Company>>(url);
         if (responseHttp.Error)
         {
-            var message = await responseHttp.GetErrorMessageAsync();
-            Snackbar.Add(message!, Severity.Error);
-            return new TableData<Country> { Items = [], TotalItems = 0 };
+            var Message = await responseHttp.GetErrorMessageAsync();
+            Snackbar.Add(Message!, Severity.Error);
+            return new TableData<Company>() { Items = [], TotalItems = 0 };
         }
-        if (responseHttp.Response == null)
+        if (responseHttp.Response is null)
         {
-            return new TableData<Country> { Items = [], TotalItems = 0 };
+            return new TableData<Company>() { Items = [], TotalItems = 0 };
         }
-        return new TableData<Country>
+        return new TableData<Company>()
         {
             Items = responseHttp.Response,
             TotalItems = TotalRecords
@@ -104,11 +103,11 @@ public partial class CountriesIndex
             {
                 { "Id", id }
             };
-            dialog = await DialogService.ShowAsync<CountryEdit>("Editar país", parameters, options);
+            dialog = await DialogService.ShowAsync<CompanyEdit>("Editar empresa", parameters, options);
         }
         else
         {
-            dialog = await DialogService.ShowAsync<CountryCreate>("Nuevo país", options);
+            dialog = await DialogService.ShowAsync<CompanyCreate>("Nueva empresa", options);
         }
 
         var result = await dialog.Result;
@@ -119,26 +118,31 @@ public partial class CountriesIndex
         }
     }
 
-    private async Task DeleteAsync(Country country)
+    private async Task DeleteAsync(Company company)
     {
         var parameters = new DialogParameters
         {
-            { "Message", $"¿Estás seguro de querer borrar el país {country.Name}?" }
+            { "Message", $"¿Estás seguro de que deseas eliminar la empresa '{company.Name}'?" },
         };
-        var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall, CloseOnEscapeKey = true };
+
+        var options = new DialogOptions
+        {
+            CloseButton = true,
+            MaxWidth = MaxWidth.ExtraSmall,
+            CloseOnEscapeKey = true
+        };
         var dialog = await DialogService.ShowAsync<ConfirmDialog>("Confirmación", parameters, options);
         var result = await dialog.Result;
-        if (result!.Canceled)
+        if (!result!.Canceled)
         {
             return;
         }
-
-        var responseHttp = await Repository.DeleteAsync($"{BaseUrl}/{country.Id}");
+        var responseHttp = await Repository.DeleteAsync($"{BaseUrl}/{company.Id}");
         if (responseHttp.Error)
         {
             if (responseHttp.HttpResponseMessage.StatusCode == HttpStatusCode.NotFound)
             {
-                NavigationManager.NavigateTo("/countries");
+                NavigationManager.NavigateTo("/companies");
             }
             else
             {
@@ -149,6 +153,6 @@ public partial class CountriesIndex
         }
         await LoadTotalRecordsAsync();
         await table.ReloadServerData();
-        Snackbar.Add("País " + @country.Name + " borrado", Severity.Success);
+        Snackbar.Add("Empresa " + company.Name + " eliminada.", Severity.Success);
     }
 }
