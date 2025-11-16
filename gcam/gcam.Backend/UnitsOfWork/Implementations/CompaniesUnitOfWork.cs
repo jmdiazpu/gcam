@@ -22,4 +22,6 @@ public class CompaniesUnitOfWork : GenericUnitOfWork<Company>, ICompaniesUnitOfW
     public override async Task<ActionResponse<IEnumerable<Company>>> GetAsync() => await _CompaniesRepository.GetAsync();
 
     public override async Task<ActionResponse<Company>> GetAsync(int id) => await _CompaniesRepository.GetAsync(id);
+
+    public async Task<IEnumerable<Company>> GetComboAsync() => await _CompaniesRepository.GetComboAsync();
 }

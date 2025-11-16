@@ -1,6 +1,7 @@
 ﻿using gcam.Backend.UnitsOfWork.Interfaces;
 using gcam.Shared.DTOs;
 using gcam.Shared.Entities;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace gcam.Backend.Controllers;
@@ -58,5 +59,12 @@ public class StatesController : GenericController<State>
             return Ok(action.Result);
         }
         return NotFound();
+    }
+
+    [AllowAnonymous]
+    [HttpGet("combo/{countryId:int}")]
+    public async Task<IActionResult> GetComboAsync(int countryId)
+    {
+        return Ok(await _statesUnitOfWork.GetComboAsync(countryId));
     }
 }

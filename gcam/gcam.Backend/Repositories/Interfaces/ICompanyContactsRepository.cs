@@ -13,4 +13,6 @@ public interface ICompanyContactsRepository
     Task<ActionResponse<CompanyContact>> GetAsync(int id);
 
     Task<ActionResponse<IEnumerable<CompanyContact>>> GetAsync();
+
+    Task<IEnumerable<CompanyContact>> GetComboAsync(int companyId);
 }

@@ -1,5 +1,4 @@
-﻿using gcam.Backend.Repositories.Implementations;
-using gcam.Backend.Repositories.Interfaces;
+﻿using gcam.Backend.Repositories.Interfaces;
 using gcam.Backend.UnitsOfWork.Interfaces;
 using gcam.Shared.DTOs;
 using gcam.Shared.Entities;
@@ -23,4 +22,6 @@ public class CompanyContactsUnitOfWork : GenericUnitOfWork<CompanyContact>, ICom
     public override async Task<ActionResponse<IEnumerable<CompanyContact>>> GetAsync() => await _companyContacts.GetAsync();
 
     public override async Task<ActionResponse<CompanyContact>> GetAsync(int id) => await _companyContacts.GetAsync(id);
+
+    public async Task<IEnumerable<CompanyContact>> GetComboAsync(int companyId) => await _companyContacts.GetComboAsync(companyId);
 }

@@ -86,5 +86,13 @@ namespace gcam.Backend.Repositories.Implementations
                 Result = companyContact
             };
         }
+
+        public async Task<IEnumerable<CompanyContact>> GetComboAsync(int companyId)
+        {
+            return await _context.CompanyContacts
+                .Where(x => x.CompanyId == companyId)
+                .OrderBy(x => x.FullName)
+                .ToListAsync();
+        }
     }
 }

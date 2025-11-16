@@ -38,6 +38,14 @@ namespace gcam.Backend.Repositories.Implementations
             };
         }
 
+        public async Task<IEnumerable<City>> GetComboAsync(int stateId)
+        {
+            return await _context.Cities
+                .Where(x => x.State!.Id == stateId)
+                .OrderBy(x => x.Name)
+                .ToListAsync();
+        }
+
         public override async Task<ActionResponse<int>> GetTotalRecordsAsync(PaginationDTO pagination)
         {
             var queryable = _context.Cities

@@ -6,6 +6,8 @@ namespace gcam.Backend.Repositories.Interfaces;
 
 public interface ICountriesRepository
 {
+    Task<IEnumerable<Country>> GetComboAsync();
+
     Task<ActionResponse<IEnumerable<Country>>> GetAsync(PaginationDTO pagination);
 
     Task<ActionResponse<int>> GetTotalRecordsAsync(PaginationDTO pagination);

@@ -83,4 +83,11 @@ public class CompaniesRepository : GenericRepository<Company>, ICompaniesReposit
             Result = company
         };
     }
+
+    public async Task<IEnumerable<Company>> GetComboAsync()
+    {
+        return await _context.Companies
+            .OrderBy(x => x.Name)
+            .ToListAsync();
+    }
 }

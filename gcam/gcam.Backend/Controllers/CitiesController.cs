@@ -1,41 +1,48 @@
 ﻿using gcam.Backend.UnitsOfWork.Interfaces;
 using gcam.Shared.DTOs;
 using gcam.Shared.Entities;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace gcam.Backend.Controllers
+namespace gcam.Backend.Controllers;
+
+[ApiController]
+[Route("api/[controller]")]
+public class CitiesController : GenericController<City>
 {
-    [ApiController]
-    [Route("api/[controller]")]
-    public class CitiesController : GenericController<City>
+    private readonly ICitiesUnitOfWork _citiesUnitOfWork;
+
+    public CitiesController(IGenericUnitOfWork<City> unitOfWork, ICitiesUnitOfWork citiesUnitOfWork) : base(unitOfWork)
     {
-        private readonly ICitiesUnitOfWork _citiesUnitOfWork;
+        _citiesUnitOfWork = citiesUnitOfWork;
+    }
 
-        public CitiesController(IGenericUnitOfWork<City> unitOfWork, ICitiesUnitOfWork citiesUnitOfWork) : base(unitOfWork)
+    [HttpGet("paginated")]
+    public override async Task<IActionResult> GetAsync([FromQuery] PaginationDTO pagination)
+    {
+        var response = await _citiesUnitOfWork.GetAsync(pagination);
+        if (response.WasSuccess)
         {
-            _citiesUnitOfWork = citiesUnitOfWork;
+            return Ok(response.Result);
         }
+        return BadRequest();
+    }
 
-        [HttpGet("paginated")]
-        public override async Task<IActionResult> GetAsync([FromQuery] PaginationDTO pagination)
+    [HttpGet("totalRecords")]
+    public override async Task<IActionResult> GetTotalRecordsAsync([FromQuery] PaginationDTO pagination)
+    {
+        var action = await _citiesUnitOfWork.GetTotalRecordsAsync(pagination);
+        if (action.WasSuccess)
         {
-            var response = await _citiesUnitOfWork.GetAsync(pagination);
-            if (response.WasSuccess)
-            {
-                return Ok(response.Result);
-            }
-            return BadRequest();
+            return Ok(action.Result);
         }
+        return BadRequest();
+    }
 
-        [HttpGet("totalRecords")]
-        public override async Task<IActionResult> GetTotalRecordsAsync([FromQuery] PaginationDTO pagination)
-        {
-            var action = await _citiesUnitOfWork.GetTotalRecordsAsync(pagination);
-            if (action.WasSuccess)
-            {
-                return Ok(action.Result);
-            }
-            return BadRequest();
-        }
+    [AllowAnonymous]
+    [HttpGet("combo/{stateId:int}")]
+    public async Task<IActionResult> GetComboAsync(int stateId)
+    {
+        return Ok(await _citiesUnitOfWork.GetComboAsync(stateId));
     }
 }

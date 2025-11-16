@@ -13,4 +13,6 @@ public interface ICompaniesUnitOfWork
     Task<ActionResponse<Company>> GetAsync(int id);
 
     Task<ActionResponse<IEnumerable<Company>>> GetAsync();
+
+    Task<IEnumerable<Company>> GetComboAsync();
 }

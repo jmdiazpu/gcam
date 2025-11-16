@@ -1,6 +1,7 @@
 ﻿using gcam.Backend.UnitsOfWork.Interfaces;
 using gcam.Shared.DTOs;
 using gcam.Shared.Entities;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace gcam.Backend.Controllers;
@@ -58,5 +59,12 @@ public class CompaniesController : GenericController<Company>
             return Ok(action.Result);
         }
         return NotFound();
+    }
+
+    [AllowAnonymous]
+    [HttpGet("combo")]
+    public async Task<IActionResult> GetComboAsync()
+    {
+        return Ok(await _companiesUnitOfWork.GetComboAsync());
     }
 }
