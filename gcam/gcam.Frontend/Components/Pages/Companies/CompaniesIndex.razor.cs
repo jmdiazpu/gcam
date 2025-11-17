@@ -10,8 +10,9 @@ namespace gcam.Frontend.Components.Pages.Companies;
 public partial class CompaniesIndex
 {
     private List<Company>? Companies { get; set; }
+
     private MudTable<Company> table = new();
-    private readonly int[] pageSizeOptions = { 10, 25, 50, int.MaxValue };
+    private readonly int[] pageSizeOptions = [10, 25, 50, int.MaxValue];
     private int TotalRecords;
     private bool Loading;
     private const string BaseUrl = "api/companies";
@@ -29,7 +30,7 @@ public partial class CompaniesIndex
         await LoadTotalRecordsAsync();
     }
 
-    private void StatesAction(Company company)
+    private void CompanyContactsAction(Company company)
     {
         NavigationManager.NavigateTo($"/companies/details/{company.Id}");
     }
@@ -101,7 +102,7 @@ public partial class CompaniesIndex
         {
             var parameters = new DialogParameters
             {
-                { "Id", id }
+                { "Id", id}
             };
             dialog = await DialogService.ShowAsync<CompanyEdit>("Editar empresa", parameters, options);
         }
@@ -122,7 +123,7 @@ public partial class CompaniesIndex
     {
         var parameters = new DialogParameters
         {
-            { "Message", $"¿Estás seguro de que deseas eliminar la empresa '{company.Name}'?" },
+            { "Message", $"¿Estás seguro de que deseas eliminar la empresa: '{company.Name}'?" },
         };
 
         var options = new DialogOptions
@@ -133,7 +134,7 @@ public partial class CompaniesIndex
         };
         var dialog = await DialogService.ShowAsync<ConfirmDialog>("Confirmación", parameters, options);
         var result = await dialog.Result;
-        if (!result!.Canceled)
+        if (result!.Canceled)
         {
             return;
         }

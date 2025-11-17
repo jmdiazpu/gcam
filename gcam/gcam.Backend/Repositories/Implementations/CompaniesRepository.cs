@@ -20,6 +20,8 @@ public class CompaniesRepository : GenericRepository<Company>, ICompaniesReposit
     public override async Task<ActionResponse<IEnumerable<Company>>> GetAsync(PaginationDTO pagination)
     {
         var queryable = _context.Companies
+            .Include(c => c.City)
+            .Include(x => x.CompanyContacts)
             .AsQueryable();
 
         if (!string.IsNullOrEmpty(pagination.Filter))
@@ -56,6 +58,8 @@ public class CompaniesRepository : GenericRepository<Company>, ICompaniesReposit
     public override async Task<ActionResponse<IEnumerable<Company>>> GetAsync()
     {
         var companies = await _context.Companies
+            .Include(c => c.City)
+            .Include(x => x.CompanyContacts)
             .OrderBy(x => x.Name)
             .ToListAsync();
 
@@ -69,6 +73,10 @@ public class CompaniesRepository : GenericRepository<Company>, ICompaniesReposit
     public override async Task<ActionResponse<Company>> GetAsync(int id)
     {
         var company = await _context.Companies
+            .Include(c => c.City)
+            .ThenInclude(city => city!.State)
+            .ThenInclude(state => state!.Country)
+            .Include(x => x.CompanyContacts)
             .FirstOrDefaultAsync(x => x.Id == id);
         if (company == null)
         {

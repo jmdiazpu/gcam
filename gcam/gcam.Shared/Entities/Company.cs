@@ -1,9 +1,8 @@
-﻿using gcam.Shared.Interfaces;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace gcam.Shared.Entities;
 
-public class Company : IEntityWithName
+public class Company
 {
     public int Id { get; set; }
 
@@ -25,6 +24,5 @@ public class Company : IEntityWithName
 
     public ICollection<CompanyContact>? CompanyContacts { get; set; }
 
-    [Display(Name = "Empresas")]
     public int CompanyContactsNumber => CompanyContacts == null ? 0 : CompanyContacts.Count;
 }

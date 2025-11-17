@@ -123,7 +123,7 @@ public partial class CountriesIndex
     {
         var parameters = new DialogParameters
         {
-            { "Message", $"¿Estás seguro de querer borrar el país {country.Name}?" }
+            { "Message", $"¿Estás seguro de querer borrar el país: {country.Name}?" }
         };
         var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall, CloseOnEscapeKey = true };
         var dialog = await DialogService.ShowAsync<ConfirmDialog>("Confirmación", parameters, options);

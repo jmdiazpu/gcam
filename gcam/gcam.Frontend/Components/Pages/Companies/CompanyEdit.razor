@@ -1,5 +1,62 @@
-﻿<h3>CompanyEdit</h3>
+﻿@page "/CompanyEdit"
+@using gcam.Shared.Entities
 
-@code {
+@if (loading)
+{
+    <Loading />
+}
+else
+{
+    <EditForm Model="company"
+              OnValidSubmit="EditAsync"
+              OnInvalidSubmit="InvalidForm">
+        <DataAnnotationsValidator />
+        <MudGrid>
+            <MudItem sm="12">
+                <MudCard>
+                    <MudCardContent>
+                        <MudTextField Label="Nombre" @bind-Value="company!.Name" For="@(() => company!.Name)" Class="mt-3" />
+                        <MudTextField Label="Dirección" @bind-Value="company.Address" For="@(() => company.Address)" Class="mb-4" />
+                        <MudAutocomplete T="Country"
+                                         Label="País"
+                                         Placeholder="--Seleccione un País--"
+                                         SearchFunc="SearchCountries"
+                                         Value="selectedCountry"
+                                         ValueChanged="CountryChangesAsync"
+                                         ToStringFunc="@(e=>e==null?null : $"{e.Name}")"
+                                         Disabled="true"
+                                         Clearable="false">
 
+                        </MudAutocomplete>
+                        <MudAutocomplete T="State"
+                                         Label="Departamento"
+                                         Placeholder="--Seleccione un Departamento--"
+                                         SearchFunc="SearchStates"
+                                         Value="selectedState"
+                                         ValueChanged="StateChangeAsync"
+                                         ToStringFunc="@(e=>e==null?null : $"{e.Name}")"
+                                         Disabled="true"
+                                         Clearable="false">
+                        </MudAutocomplete>
+                        <MudAutocomplete T="City"
+                                         Label="Ciudad"
+                                         Placeholder="--Seleccione una Ciudad--"
+                                         SearchFunc="SearchCities"
+                                         Value="selectedCity"
+                                         ValueChanged="CityChangeAsync"
+                                         ToStringFunc="@(e=>e==null?null : $"{e.Name}")">
+                        </MudAutocomplete>
+                    </MudCardContent>
+                    <MudCardActions>
+                        <MudButton Variant="Variant.Outlined" StartIcon="@Icons.Material.Filled.ArrowBack" Color="Color.Info" OnClick="Return">
+                            Regresar
+                        </MudButton>
+                        <MudButton Variant="Variant.Outlined" StartIcon="@Icons.Material.Filled.Check" Color="Color.Primary" ButtonType="ButtonType.Submit">
+                            Guardar
+                        </MudButton>
+                    </MudCardActions>
+                </MudCard>
+            </MudItem>
+        </MudGrid>
+    </EditForm>
 }

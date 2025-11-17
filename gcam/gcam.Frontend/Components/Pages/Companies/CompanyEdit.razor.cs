@@ -2,16 +2,17 @@ using gcam.Frontend.Repositories;
 using gcam.Shared.Entities;
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
+using System.Net;
 
 namespace gcam.Frontend.Components.Pages.Companies;
 
-public partial class CompanyCreate
+public partial class CompanyEdit
 {
-    private Company company = new();
+    private Company? company;
     private List<Country>? countries;
     private List<State>? states;
     private List<City>? cities;
-    private bool loading;
+    private bool loading = true;
 
     private Country selectedCountry = new();
     private State selectedState = new();
@@ -22,11 +23,44 @@ public partial class CompanyCreate
     [Inject] private ISnackbar Snackbar { get; set; } = null!;
     [Inject] private IDialogService DialogService { get; set; } = null!;
 
+    [Parameter] public int Id { get; set; }
+
+    // Minimal DTO for updates to avoid sending navigation properties
+    private sealed record CompanyUpdateDto(int Id, string Name, string Address, int CityId);
+
     protected override async Task OnInitializedAsync()
     {
+        await LoadCompanyAsync();
         await LoadCountriesAsync();
-        await LoadStatesAsync(selectedCountry.Id);
-        await LoadCitiesAsync(selectedState.Id);
+        await LoadStatesAsync(company!.City!.State!.Country!.Id);
+        await LoadCitiesAsync(company!.City!.State!.Id);
+
+        selectedCountry = company!.City!.State!.Country;
+        selectedState = company!.City!.State;
+        selectedCity = company!.City;
+    }
+
+    private async Task LoadCompanyAsync()
+    {
+        var responseHttp = await Repository.GetAsync<Company>($"/api/companies/{Id}");
+        if (responseHttp.Error)
+        {
+            if (responseHttp.HttpResponseMessage.StatusCode == HttpStatusCode.NotFound)
+            {
+                NavigationManager.NavigateTo("companies");
+            }
+            else
+            {
+                var messageError = await responseHttp.GetErrorMessageAsync();
+                Snackbar.Add(messageError!, Severity.Error);
+                return;
+            }
+        }
+        else
+        {
+            company = responseHttp.Response;
+            loading = false;
+        }
     }
 
     private async Task LoadCountriesAsync()
@@ -39,7 +73,6 @@ public partial class CompanyCreate
             return;
         }
         countries = responseHttp.Response;
-        selectedCountry = countries![0];
     }
 
     private async Task LoadStatesAsync(int countryId)
@@ -52,7 +85,6 @@ public partial class CompanyCreate
             return;
         }
         states = responseHttp.Response;
-        selectedState = states![0];
     }
 
     private async Task LoadCitiesAsync(int stateId)
@@ -88,7 +120,7 @@ public partial class CompanyCreate
     private void CityChangeAsync(City city)
     {
         selectedCity = city;
-        company.CityId = city.Id;
+        company!.CityId = city.Id;
     }
 
     private async Task<IEnumerable<Country>> SearchCountries(string searchText, CancellationToken token)
@@ -134,17 +166,21 @@ public partial class CompanyCreate
         Snackbar.Add("Por favor llenar todos los campos del formulario", Severity.Warning);
     }
 
-    private async Task CreateAsync()
+    private async Task EditAsync()
     {
-        var responseHttp = await Repository.PostAsync("/api/companies", company);
+        if (company == null) return;
+
+        // Build a minimal DTO to send to the API (avoid navigation props)
+        var dto = new CompanyUpdateDto(company.Id, company.Name, company.Address, company.CityId);
+        var responseHttp = await Repository.PutAsync($"/api/companies/", dto);
         if (responseHttp.Error)
         {
-            var message = await responseHttp.GetErrorMessageAsync();
-            Snackbar.Add(message!, Severity.Error);
+            var messageError = await responseHttp.GetErrorMessageAsync();
+            Snackbar.Add(messageError!, Severity.Error);
             return;
         }
         Return();
-        Snackbar.Add("Empresa " + company.Name + " creada", Severity.Success);
+        Snackbar.Add("Empresa " + company.Name + " modificada con éxito.", Severity.Success);
     }
 
     private void Return()

@@ -12,8 +12,8 @@ using gcam.Backend.Data;
 namespace gcam.Backend.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20251106030408_InitialDb")]
-    partial class InitialDb
+    [Migration("20251117112810_initialDB")]
+    partial class initialDB
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
