@@ -47,7 +47,7 @@ public partial class CompanyEdit
         {
             if (responseHttp.HttpResponseMessage.StatusCode == HttpStatusCode.NotFound)
             {
-                NavigationManager.NavigateTo("companies");
+                NavigationManager.NavigateTo("/companies");
             }
             else
             {

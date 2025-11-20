@@ -1,0 +1,31 @@
+﻿@page "/CompanyContactCreate"
+@if (loading)
+{
+    <Loading />
+}
+else
+{
+    <EditForm Model="@companyContact" OnValidSubmit="CreateAsync" OnInvalidSubmit="InvalidForm">
+        <DataAnnotationsValidator />
+        <MudGrid>
+            <MudItem sm="12">
+                <MudCard>
+                    <MudCardContent>
+                        <MudTextField Label="Nombre completo" @bind-Value="companyContact.FullName" For="@(() => companyContact.FullName)" Class="mb-3" />
+                        <MudTextField Label="Teléfono/Celular" @bind-Value="companyContact.CelularNumber" For="@(() => companyContact.CelularNumber)" Class="mb-4" />
+                        <MudTextField Label="Correo electrónico" @bind-Value="companyContact.Email" For="@(() => companyContact.Email)" Class="mb-4" />
+                        <MudTextField Label="Cargo" @bind-Value="companyContact.Position" For="@(() => companyContact.Position)" Class="mb-4" />
+                    </MudCardContent>
+                    <MudCardActions>
+                        <MudButton Variant="Variant.Outlined" StartIcon="@Icons.Material.Filled.ArrowBack" Color="Color.Info" OnClick="Return">
+                            Regresar
+                        </MudButton>
+                        <MudButton Variant="Variant.Outlined" StartIcon="@Icons.Material.Filled.Check" Color="Color.Primary" ButtonType="ButtonType.Submit">
+                            Guardar
+                        </MudButton>
+                    </MudCardActions>
+                </MudCard>
+            </MudItem>
+        </MudGrid>
+    </EditForm>
+}

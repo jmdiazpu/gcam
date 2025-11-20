@@ -87,7 +87,7 @@ public class GenericRepository<T> : IGenericRepository<T> where T : class
         {
             return new ActionResponse<T>
             {
-                Message = "No se pudo eliminar porque tiene registros relacionados."
+                Message = "No se puede eliminar porque tiene registros relacionados."
             };
         }
     }

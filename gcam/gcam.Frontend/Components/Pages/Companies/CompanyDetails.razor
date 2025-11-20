@@ -1,12 +1,11 @@
-﻿@page "/companies"
-
-@if (Loading)
+﻿@page "/companies/details/{CompanyId:int}"
+@if (loading)
 {
-    <Loading />
+    <Loading/>
 }
 else
 {
-    <MudTable Items="@Companies"
+    <MudTable Items="@contacts"
               @ref="table"
               ServerData="LoadListAsync"
               Dense="true"
@@ -15,38 +14,25 @@ else
               FixedHeader="true"
               FixedFooter="true">
         <ToolBarContent>
-            <div class="d-flex justify-content-between">
-                <MudText Typo="Typo.h6" Class="me-4">Empresas</MudText>
-                <MudButton Variant="Variant.Outlined"
-                           EndIcon="@Icons.Material.Filled.Apartment"
-                           Color="Color.Info"
-                           OnClick="@(() => ShowModalAsync())">
-                    Nuevo
-                </MudButton>
-            </div>
+            <MudText Typo="Typo.h6" Class="mr-4"><i class="bi bi-globe-americas"></i> @company!.Name</MudText>
+            <MudButton Variant="Variant.Outlined" Class="mr-4" StartIcon="@Icons.Material.Filled.ArrowBack" Color="Color.Tertiary" OnClick="ReturnAction">Regresar</MudButton>
+            <MudButton Variant="Variant.Outlined" Class="mr-4" EndIcon="@Icons.Material.Filled.Person" Color="Color.Info" OnClick="@(() => ShowModalAsync())">Crear</MudButton>
             <MudSpacer />
             <FilterComponent ApplyFilter="SetFilterValue" />
         </ToolBarContent>
         <HeaderContent>
-            <MudTh>Empresa</MudTh>
-            <MudTh>Dirección</MudTh>
-            <MudTh>Ciudad</MudTh>
-            <MudTh Style="width: 100px;">Contactos</MudTh>
-            <MudTh Style="width: 270px;">Acciones</MudTh>
+            <MudTh>Contacto</MudTh>
+            <MudTh>Teléfono/Celular</MudTh>
+            <MudTh>Correo electrónico</MudTh>
+            <MudTh>Cargo</MudTh>
+            <MudTh style="width: 270px;">Acciones</MudTh>
         </HeaderContent>
         <RowTemplate>
-            <MudTd>@context.Name</MudTd>
-            <MudTd>@context.Address</MudTd>
-            <MudTd>@context.City?.Name</MudTd>
-            <MudTd DataLabel="Contactos">
-                <MudTooltip Text="Contactos">
-                    <MudButton Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.Contacts" Color="Color.Info" OnClick="@(() => CompanyContactsAction(@context))" Style="width: 100px;">
-                        @context.CompanyContactsNumber
-                    </MudButton>
-                </MudTooltip>
-            </MudTd>
-
-            <MudTd>
+            <MudTd DataLabel="Contacto">@context.FullName</MudTd>
+            <MudTd DataLabel="Teléfono/Celular">@context.CelularNumber</MudTd>
+            <MudTd DataLabel="Correo electrónico">@context.Email</MudTd>
+            <MudTd DataLabel="Cargo">@context.Position</MudTd>
+            <MudTd DataLabel="Acciones">
                 <MudTooltip Text="Editar">
                     <MudButton Variant="Variant.Filled"
                                Color="Color.Warning"
@@ -64,13 +50,14 @@ else
             </MudTd>
         </RowTemplate>
         <NoRecordsContent>
-            <MudText>No se encontraron empresas.</MudText>
+            <MudText>No se encontraron registros.</MudText>
         </NoRecordsContent>
         <PagerContent>
-            <MudTablePager RowsPerPageString="Número de registros"
+            <MudTablePager RowsPerPageString="Numero de Registros:"
                            PageSizeOptions="pageSizeOptions"
                            AllItemsText="Todos"
                            InfoFormat="@infoFormat" />
         </PagerContent>
     </MudTable>
+
 }

@@ -1,26 +1,28 @@
+using gcam.Frontend.Components.Pages.CompanyContacts;
 using gcam.Frontend.Components.Pages.Shared;
-using gcam.Frontend.Components.Pages.States;
 using gcam.Frontend.Repositories;
 using gcam.Shared.Entities;
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
+using MudBlazor.Charts;
+using MudBlazor.Extensions;
 using System.Net;
 
-namespace gcam.Frontend.Components.Pages.Countries;
+namespace gcam.Frontend.Components.Pages.Companies;
 
-public partial class CountryDetails
+public partial class CompanyDetails
 {
-    private Country? country;
-    private List<State>? states;
+    private Company? company;
+    private List<CompanyContact>? contacts;
 
-    private MudTable<State> table = new();
+    private MudTable<CompanyContact> table = new();
     private readonly int[] pageSizeOptions = { 10, 25, 50, int.MaxValue };
     private int totalRecords = 0;
     private bool loading;
-    private const string baseUrl = "api/states";
+    private const string baseUrl = "api/companycontacts";
     private string infoFormat = "Registros {first_item} al {last_item} de {all_items}";
 
-    [Parameter] public int CountryId { get; set; }
+    [Parameter] public int CompanyId { get; set; }
 
     [Inject] private IRepository Repository { get; set; } = null!;
     [Inject] private IDialogService DialogService { get; set; } = null!;
@@ -39,78 +41,81 @@ public partial class CountryDetails
         await LoadTotalRecordsAsync();
     }
 
-    private async Task<bool> LoadCountryAsync()
-    {
-        var responseHttp = await Repository.GetAsync<Country>($"/api/countries/{CountryId}");
-        if (responseHttp.Error)
-        {
-            if (responseHttp.HttpResponseMessage.StatusCode == HttpStatusCode.NotFound)
-            {
-                NavigationManager.NavigateTo("/countries");
-                return false;
-            }
-
-            var message = await responseHttp.GetErrorMessageAsync();
-            Snackbar.Add(message!, Severity.Error);
-            return false;
-        }
-        country = responseHttp.Response;
-        return true;
-    }
-
     private async Task<bool> LoadTotalRecordsAsync()
     {
         loading = true;
-        if (country is null)
+        if (company is null)
         {
-            var ok = await LoadCountryAsync();
+            var ok = await LoadCompanyAsync();
             if (!ok)
             {
-                NoCountry();
+                NoCompany();
                 return false;
             }
         }
 
-        var url = $"{baseUrl}/totalRecords?id={CountryId}";
+        var url = $"{baseUrl}/totalRecords?id={CompanyId}";
         if (!string.IsNullOrWhiteSpace(Filter))
         {
             url += $"&filter={Filter}";
         }
-        var responseHttp = await Repository.GetAsync<int>(url);
-        if (responseHttp.Error)
+
+        var respondeHttp = await Repository.GetAsync<int>(url);
+        if (respondeHttp.Error)
         {
-            var message = await responseHttp.GetErrorMessageAsync();
+            var message = await respondeHttp.GetErrorMessageAsync();
             Snackbar.Add(message!, Severity.Error);
             return false;
         }
-        totalRecords = responseHttp.Response;
+
+        totalRecords = respondeHttp.Response;
         loading = false;
         return true;
     }
 
-    private async Task<TableData<State>> LoadListAsync(TableState state, CancellationToken cancellationToken)
+    private async Task<bool> LoadCompanyAsync()
+    {
+        var responseHttp = await Repository.GetAsync<Company>($"/api/companies/{CompanyId}");
+        if (responseHttp.Error)
+        {
+            if (responseHttp.HttpResponseMessage.StatusCode == HttpStatusCode.NotFound)
+            {
+                NavigationManager.NavigateTo("/companies");
+                return false;
+            }
+
+            var message = await responseHttp.GetErrorMessageAsync();
+            Snackbar.Add(message!, Severity.Error);
+            return false;
+        }
+
+        company = responseHttp.Response;
+        return true;
+    }
+
+    private async Task<TableData<CompanyContact>> LoadListAsync(TableState state, CancellationToken cancellationToken)
     {
         int page = state.Page + 1;
         int pageSize = state.PageSize;
-        var url = $"{baseUrl}/paginated?id={CountryId}&page={page}&recordsnumber={pageSize}";
-
+        var url = $"{baseUrl}/paginated?id={CompanyId}&page={page}&recordsnumber={pageSize}";
         if (!string.IsNullOrWhiteSpace(Filter))
         {
             url += $"&filter={Filter}";
         }
 
-        var responseHttp = await Repository.GetAsync<List<State>>(url);
+        var responseHttp = await Repository.GetAsync<List<CompanyContact>>(url);
         if (responseHttp.Error)
         {
             var message = await responseHttp.GetErrorMessageAsync();
             Snackbar.Add(message!, Severity.Error);
-            return new TableData<State> { Items = [], TotalItems = 0 };
+            return new TableData<CompanyContact> { Items = [], TotalItems = 0 };
         }
+
         if (responseHttp.Response == null)
         {
-            return new TableData<State> { Items = [], TotalItems = 0 };
+            return new TableData<CompanyContact> { Items = [], TotalItems = 0 };
         }
-        return new TableData<State>
+        return new TableData<CompanyContact>
         {
             Items = responseHttp.Response,
             TotalItems = totalRecords
@@ -126,7 +131,7 @@ public partial class CountryDetails
 
     private void ReturnAction()
     {
-        NavigationManager.NavigateTo("/countries");
+        NavigationManager.NavigateTo("/companies");
     }
 
     private async Task ShowModalAsync(int id = 0, bool isEdit = false)
@@ -143,41 +148,32 @@ public partial class CountryDetails
             {
                 { "Id", id }
             };
-            dialog = await DialogService.ShowAsync<StateEdit>("Editar departamento", parameters, options);
+            dialog = await DialogService.ShowAsync<CompanyContactEdit>("Editar contacto", parameters, options);
         }
         else
         {
             var parameters = new DialogParameters
-                {
-                    { "CountryId", CountryId }
-                };
-            dialog = await DialogService.ShowAsync<StateCreate>("Nuevo departamento", parameters, options);
+            {
+                { "CompanyId", CompanyId }
+            };
+            dialog = await DialogService.ShowAsync<CompanyContactCreate>("Nuevo contacto", parameters, options);
         }
 
         var result = await dialog.Result;
-        if (result!.Canceled!)
+        if (result!.Canceled)
         {
             await LoadTotalRecordsAsync();
             await table.ReloadServerData();
         }
     }
 
-    private void CitiesAction(State state)
-    {
-        NavigationManager.NavigateTo($"/states/details/{state.Id}");
-    }
-
-    private void NoCountry()
-    {
-        NavigationManager.NavigateTo("/countries");
-    }
-
-    private async Task DeleteAsync(State state)
+    private async Task DeleteAsync(CompanyContact contact)
     {
         var parameters = new DialogParameters
-            {
-                { "Message", $"¿Estás seguro de que quieres eliminar el departamento {state.Name}?" }
-            };
+        {
+            {"Message", $"¿Realmente quieres eliminar el contacto: {contact.FullName}?" }
+        };
+
         var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall, CloseOnEscapeKey = true };
         var dialog = await DialogService.ShowAsync<ConfirmDialog>("Confirmación", parameters, options);
         var result = await dialog.Result;
@@ -186,15 +182,20 @@ public partial class CountryDetails
             return;
         }
 
-        var responseHttp = await Repository.DeleteAsync($"api/states/{state.Id}");
+        var responseHttp = await Repository.DeleteAsync($"api/companycontacts/{contact.Id}");
         if (responseHttp.Error)
         {
             var message = await responseHttp.GetErrorMessageAsync();
-            Snackbar.Add(message!, Severity.Error);
+            Snackbar.Add(message, Severity.Error);
             return;
         }
         await LoadAsync();
         await table.ReloadServerData();
-        Snackbar.Add("Departamento " + @state.Name + " eliminado.", Severity.Success);
+        Snackbar.Add("Contacto " + contact.FullName + " eliminado.", Severity.Success);
+    }
+
+    private void NoCompany()
+    {
+        NavigationManager.NavigateTo("/companies");
     }
 }

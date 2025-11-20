@@ -20,22 +20,13 @@ public class HttpResponseWrapper<T>
         if (!Error) return null;
 
         var statusCode = HttpResponseMessage.StatusCode;
-        switch (statusCode)
+        return statusCode switch
         {
-            case HttpStatusCode.NotFound:
-                return "Recurso no encontrado.";
-
-            case HttpStatusCode.BadRequest:
-                return await HttpResponseMessage.Content.ReadAsStringAsync();
-
-            case HttpStatusCode.Unauthorized:
-                return "Tienes que iniciar sesión para realizar esta operación.";
-
-            case HttpStatusCode.Forbidden:
-                return "No tienes permiso para realizar esta operación.";
-
-            default:
-                return "Ha ocurrido un error inesperado.";
-        }
+            HttpStatusCode.NotFound => "Recurso no encontrado.",
+            HttpStatusCode.BadRequest => await HttpResponseMessage.Content.ReadAsStringAsync(),
+            HttpStatusCode.Unauthorized => "Tienes que iniciar sesión para realizar esta operación.",
+            HttpStatusCode.Forbidden => "No tienes permiso para realizar esta operación.",
+            _ => "Ha ocurrido un error inesperado.",
+        };
     }
 }

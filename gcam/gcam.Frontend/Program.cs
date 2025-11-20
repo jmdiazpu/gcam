@@ -12,11 +12,11 @@ builder.Services.AddRazorComponents()
 builder.Services.AddScoped(_ => new HttpClient { BaseAddress = new Uri("https://localhost:7127") });
 builder.Services.AddScoped<IRepository, Repository>();
 
-//builder.Services.AddServerSideBlazor()
-//    .AddCircuitOptions(options =>
-//    {
-//        options.DetailedErrors = true;
-//    });
+builder.Services.AddServerSideBlazor()
+    .AddCircuitOptions(options =>
+    {
+        options.DetailedErrors = true;
+    });
 
 var app = builder.Build();
 
